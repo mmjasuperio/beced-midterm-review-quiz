@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BECED Midterm Online Examination Portal</title>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            margin: 0;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        .assessment-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #000000;
+            padding: 30px;
+        }
+        h1 {
+            font-size: 22px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #000000;
+            padding-bottom: 10px;
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+        .sub-header {
+            font-size: 14px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .section-header {
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            background-color: #f2f2f2;
+            padding: 8px;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            border: 1px solid #000000;
+        }
+        .form-field {
+            margin-bottom: 15px;
+        }
+        .form-field label {
+            display: block;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        .form-field input, .form-field select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #000000;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+        }
+        .item-box {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #cccccc;
+        }
+        .item-question {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .option-row {
+            margin-bottom: 6px;
+            display: block;
+        }
+        .option-row input {
+            margin-right: 10px;
+        }
+        .btn-submit {
+            background-color: #000000;
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .btn-submit:hover {
+            background-color: #333333;
+        }
+        .security-lockout {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            color: #000000;
+            z-index: 10000;
+            text-align: center;
+            padding-top: 15%;
+            font-family: Arial, sans-serif;
+        }
+        .security-lockout h2 {
+            font-size: 28px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        .security-lockout p {
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 16px;
+        }
+        .plain-hud {
+            border: 1px solid #000000;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            background-color: #fafafa;
+        }
+        .editor-banner {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="assessment-container">
+        <h1>Bachelor of Early Childhood Education (BECED)</h1>
+        <div class="sub-header">Midterm Examination: Advanced Foundations of Infant-Toddler Caregiving & Play Curricula</div>
+
+        <!-- EDITOR NOTIFICATION BANNER -->
+        <div id="editor-banner-view" class="editor-banner" style="display:none;">
+            🛠️ Editor Mode Activated: Account Verified as Professor. Proctoring lockouts, tab-switch monitoring, and split-screen restrictions are fully decoupled for previewing.
+        </div>
+
+        <!-- TELEMETRY HUD -->
+        <div class="plain-hud" id="hud-bar" style="display:none;">
+            Player Session initialized | Security tracking active | Tab Switches: <span id="hud-tab">0</span> | Split-Screen Detected: <span id="hud-split">No</span>
+        </div>
+
+        <!-- ONBOARDING REGISTRATION -->
+        <div id="auth-panel">
+            <p>Please supply your student registration attributes to unlock the examination package. The interface enforces absolute academic compliance. Deviations are appended to the professor's database ledger.</p>
+            <div class="form-field">
+                <label for="student-name">Student Full Name (Last Name, First Name):</label>
+                <input type="text" id="student-name" placeholder="e.g. SANTIAGO, MARIA">
+            </div>
+            <div class="form-field">
+                <label for="student-year">Year Level Designation:</label>
+                <select id="student-year">
+                    <option value="">-- SELECT DESIGNATION --</option>
+                    <option value="BECED 1st Year">BECED 1st Year</option>
+                    <option value="BECED 2nd Year">BECED 2nd Year</option>
+                    <option value="BECED 3rd Year">BECED 3rd Year</option>
+                    <option value="BECED 4th Year">BECED 4th Year</option>
+                </select>
+            </div>
+            <button class="btn-submit" onclick="initializeExamSession()">Unlock Examination Questionnaire</button>
+        </div>
+
+        <!-- LIVE QUESTIONNAIRE PANEL -->
+        <div id="quiz-panel" style="display:none;">
+            <form id="examination-form" onsubmit="event.preventDefault();">
+                
+                <div class="section-header">PART I: MULTIPLE CHOICE QUESTIONS (ITEMS 1 - 30)</div>
+                <div id="container-mcq"></div>
+
+                <div class="section-header">PART II: TRUE OR FALSE QUESTIONS (ITEMS 31 - 45)</div>
+                <div id="container-tf"></div>
+
+                <button type="button" class="btn-submit" onclick="processFinalSubmission()">Transmit Final Responses for Evaluation</button>
+            </form>
+        </div>
+
+        <!-- COMPLETION RESULTS VIEW -->
+        <div id="results-panel" style="display:none;">
+            <h2>EXAMINATION ARCHIVE COMPLETED</h2>
+            <p>Your responses have been locked, scored, and prepared for systemic archival synchronization.</p>
+            <p><strong>Calculated Score:</strong> <span id="score-display">0 / 45</span> (<span id="percent-display">0%</span>)</p>
+            <p>Database transmission pending manual validation sync trigger below.</p>
+            <button class="btn-submit" style="background-color:#1f4e78;" id="sync-button" onclick="executeDataSynchronization()">Commit Records to Professor Tracker Sheet</button>
+            <p id="sync-status" style="margin-top:15px; font-weight:bold; font-size:13px; text-transform:uppercase; text-align:center;"></p>
+        </div>
+    </div>
+
+    <!-- LOCKDOWN OVERLAY INTERFACE -->
+    <div id="lockdown-overlay" class="security-lockout">
+        <h2>INTEGRITY VIOLATION DISCOVERED</h2>
+        <p id="lockdown-rationale">The system security protocol detected a prohibited navigation event or unauthorized window modification. Access has been frozen permanently. This security event has been logged to the tracking server alongside your student profile identifier.</p>
+    </div>
+
+    <script>
+        // CONFIGURATION LINK - PASTE DEPLOYED GOOGLE APPS SCRIPT WEB APP URL HERE
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbznZTA0st6hdrBuJ5Zd4ekUEPXMEOX9suFgxZNhdIw2toSMoaq7xPFPyvOrNflQobt3/exec";
+
+        const examPool = [{"id": 1, "type": "MCQ", "question": "According to John Bowlby's attachment theory, what is the primary evolutionary purpose of an infant's attachment behaviors, such as crying or smiling?", "options": ["A) To accelerate cognitive equilibrium and sensorimotor development.", "B) To ensure proximity to a protective caregiver for survival.", "C) To establish dominance within the immediate peer group ecosystem.", "D) To practice linguistic vocalizations and phonetic mapping."], "correct": "B"}, {"id": 2, "type": "MCQ", "question": "In Mary Ainsworth's Strange Situation classification, a toddler who shows minimal distress when the caregiver leaves and actively avoids contact upon their return most likely exhibits which attachment pattern?", "options": ["A) Secure attachment", "B) Anxious-ambivalent attachment", "C) Anxious-avoidant attachment", "D) Disorganized-disoriented attachment"], "correct": "C"}, {"id": 3, "type": "MCQ", "question": "Which concepts best illustrate the 'serve and return' interaction paradigm developed by the Center on the Developing Child at Harvard University?", "options": ["A) Responsive, back-and-forth vocalizations and gestures between an infant and caregiver.", "B) Unidirectional instructional lecturing from an educator to passive toddlers.", "C) Automated, digital text-to-speech feedback mechanisms within educational software.", "D) Strict structural rotation of child care staff across different age groups."], "correct": "A"}, {"id": 4, "type": "MCQ", "question": "Magda Gerber's Resources for Infant Educarers (RIE) approach asserts that routine caregiving tasks like diapering and feeding should be treated as:", "options": ["A) Purely administrative disruptions to the child's block play intervals.", "B) Tasks to be completed as quickly as possible to maximize classroom productivity.", "C) Activities delegated exclusively to auxiliary support personnel.", "D) Opportunities for core curriculum development and deep, one-on-one relational interactions."], "correct": "D"}, {"id": 5, "type": "MCQ", "question": "According to Lev Vygotsky, how does a play-based curriculum directly facilitate cognitive advancement within the Zone of Proximal Development (ZPD)?", "options": ["A) By isolating the child from socio-cultural influences to preserve cognitive purity.", "B) By creating a self-regulated context where children operate above their current independent behavior level through rule-governed roles.", "C) By prioritizing physical exhaustion to enhance nocturnal sleep architectures.", "D) By eliminating the need for adult scaffolding or environmental design."], "correct": "B"}, {"id": 6, "type": "MCQ", "question": "Sara Smilansky's classification of play identifies four distinct categories. Which category represents the highest level of cognitive complexity in early childhood?", "options": ["A) Functional play", "B) Constructive play", "C) Dramatic or Socio-dramatic play", "D) Games with rules"], "correct": "C"}, {"id": 7, "type": "MCQ", "question": "When an infant displays a disorganized attachment pattern during assessment, empirical literature suggests this is highly correlated with:", "options": ["A) Nurturing, predictable, and highly synchronized maternal attunement.", "B) Over-exposure to modern multi-sensory educational toys.", "C) Early mastery of the object permanence cognitive stage.", "D) Caregivers who are simultaneously perceived as sources of fear and safety."], "correct": "D"}, {"id": 8, "type": "MCQ", "question": "In Mildred Parten's developmental stages of play, what distinguishes cooperative play from associative play?", "options": ["A) Children in cooperative play work toward a common group goal with distinct assigned roles.", "B) Associative play involves strict physical isolation with zero material sharing.", "C) Cooperative play is completely unstructured and lacks any operational rules.", "D) Associative play is governed entirely by an adult coordinator."], "correct": "A"}, {"id": 9, "type": "MCQ", "question": "Dr. Emmi Pikler's approach emphasizes that gross motor development in infants should manifest through:", "options": ["A) Rigid, schedule-based physical therapy routines led by educators.", "B) Passive restriction in specialized walkers and bouncers to force stability.", "C) Uninterrupted, autonomous movement allowed by a safe environment and zero adult acceleration.", "D) Mechanical tracking of standardized biological growth percentiles."], "correct": "C"}, {"id": 10, "type": "MCQ", "question": "What is the primary operational objective of implementing 'primary caregiving configurations' in an infant-toddler center?", "options": ["A) To minimize overall staffing overhead and operational expenditures.", "B) To allow one specific educator to build a deep, continuous, and predictable relationship with a small group of children.", "C) To rotate teachers hourly so infants do not develop separation anxiety.", "D) To optimize standardized metric documentation for regulatory bodies."], "correct": "B"}, {"id": 11, "type": "MCQ", "question": "Which of the following interactions best represents a 'responsive' rather than a 'directive' adult communication style during toddler free-play?", "options": ["A) 'I see you are stacking those blocks higher and higher; it looks like you are balancing them carefully.'", "B) 'Put the blue square block on top of the red circle block right now.'", "C) 'Stop playing with those blocks and move to the art area immediately.'", "D) 'That is not how you build a house with blocks; let me do it for you.'"], "correct": "A"}, {"id": 12, "type": "MCQ", "question": "Jean Piaget conceptualized that 'symbolic play' emerges predominantly during which stage of cognitive development?", "options": ["A) Sensorimotor Stage", "B) Preoperational Stage", "C) Concrete Operational Stage", "D) Formal Operational Stage"], "correct": "B"}, {"id": 13, "type": "MCQ", "question": "The concept of 'emotional attunement' between an infant and a primary caregiver refers to:", "options": ["A) The caregiver tracking the infant's absolute physical weight and caloric values.", "B) Teaching the infant how to play musical instruments prior to age one.", "C) Ignoring negative infant affect to promote emotional independence.", "D) The caregiver recognizing, reflecting, and responding accurately to the infant's internal feeling states."], "correct": "D"}, {"id": 14, "type": "MCQ", "question": "When designing a play-based curriculum, 'loose parts' are highly valued by educators because they:", "options": ["A) Possess predefined functions that restrict creative deviations.", "B) Are open-ended materials that can be moved, combined, redesigned, and manipulated in infinite ways.", "C) Minimize the need for regular classroom sterilization routines.", "D) Replace the necessity for intentional pedagogical planning."], "correct": "B"}, {"id": 15, "type": "MCQ", "question": "An infant who uses their primary caregiver as a 'secure base' from which to explore a novel environment demonstrates:", "options": ["A) A healthy secure attachment pattern that promotes autonomous environmental exploration.", "B) An unhealthy, hyper-dependent psychological codependency.", "C) A delayed cognitive response to external sensory stimuli.", "D) A localized orientation deficit."], "correct": "A"}, {"id": 16, "type": "MCQ", "question": "During a diapering routine, a responsive educator will involve the infant by:", "options": ["A) Using continuous distractions like mobile phone screens to keep the child completely passive.", "B) Remaining completely silent to ensure speed and clinical cleanliness.", "C) Communicating each action before it happens and inviting the child's cooperation.", "D) Treating the infant as an object to be rapidly repositioned."], "correct": "C"}, {"id": 17, "type": "MCQ", "question": "Which type of play involves children playing side-by-side with similar materials but without any shared organization or structural collaboration?", "options": ["A) Solitary play", "B) Parallel play", "C) Onlooker play", "D) Cooperative play"], "correct": "B"}, {"id": 18, "type": "MCQ", "question": "The dynamic systems theory of motor development suggests that an infant's physical progress is driven by:", "options": ["A) Purely genetic, hardwired neurological commands independent of environment.", "B) Explicit verbal coaching and instruction provided by early childhood professionals.", "C) Strictly linear structural schedules dictated by physiological age.", "D) The convergence of neurological growth, environmental opportunities, and intrinsic motivation."], "correct": "D"}, {"id": 19, "type": "MCQ", "question": "When an early childhood professional implements 'contingent responsiveness,' they are ensuring that their reactions to an infant's cues are:", "options": ["A) Prompt, accurately matched to the child's explicit need, and emotionally synchronous.", "B) Scheduled at fixed 30-minute intervals throughout the operational day.", "C) Delayed intentionally to build structural resilience against stress.", "D) Standardized across all children regardless of individual temperamental profiles."], "correct": "A"}, {"id": 20, "type": "MCQ", "question": "Which of the following is a primary indicator of high-quality socio-dramatic play in a classroom of four-year-olds?", "options": ["A) Complete reliance on highly realistic, single-purpose commercial plastic toys.", "B) The execution of sustained role-play configurations lasting across extended intervals with metacommunication.", "C) Total absence of any underlying rules or contextual framework.", "D) Absolute silence as children independently manifest internal scripts."], "correct": "B"}, {"id": 21, "type": "MCQ", "question": "Edward Tronick's famous 'Still Face Experiment' empirically demonstrates that when a caregiver displays a prolonged flat, unresponsive affect, infants:", "options": ["A) Immediately self-soothe and transition smoothly into autonomous exploratory play.", "B) Show complete indifference due to a lack of situational awareness.", "C) Exhibit rapid emotional distress, make active attempts to re-engage the adult, and eventually withdraw.", "D) Accelerate their internal language acquisition processing."], "correct": "C"}, {"id": 22, "type": "MCQ", "question": "What does the term 'guided play' mean within a modern play-based early childhood curriculum framework?", "options": ["A) The adult taking complete control of materials and directing every physical action.", "B) Child-led exploration supported by intentional adult scaffolding, open-ended questioning, and environmental curation.", "C) Rote worksheet exercises framed with animated cartoon illustrations.", "D) Total adult non-intervention where children are left unobserved."], "correct": "B"}, {"id": 23, "type": "MCQ", "question": "The concept of 'maternal deprivation' historically advanced by early psychoanalytic theorists emphasizes that:", "options": ["A) Continuous, uninterrupted maternal care during early childhood is critical for long-term mental health.", "B) Infants require institutional settings to optimize operational metric competencies.", "C) Fathers are biologically superior primary caregiving entities during the first quarter-life phase.", "D) Cognitive training must override emotional synchronization models."], "correct": "A"}, {"id": 24, "type": "MCQ", "question": "In an infant care setting, 'continuity of care' is a structural policy where:", "options": ["A) Children are reassigned to new educators every six months to diversify social exposure.", "B) Daily shift rotations ensure that zero emotional preferences are established.", "C) Academic curricula are prioritized over emotional safety frameworks.", "D) A primary caregiver remains with the same cohort of infants from enrollment through their transition into toddlerhood."], "correct": "D"}, {"id": 25, "type": "MCQ", "question": "When a toddler engages in 'transgressive play' (testing boundaries or playing with forbidden objects), a responsive educator interprets this as:", "options": ["A) Malicious behavior requiring immediate exclusionary discipline.", "B) A normative developmental manifestation of autonomy, environmental investigation, and cause-and-effect learning.", "C) A core breakdown of the educational framework's authority matrix.", "D) A symptom of profound emotional dysregulation."], "correct": "B"}, {"id": 26, "type": "MCQ", "question": "Which element forms the foundation of 'respectful caregiving routines' as championed by the Pikler and RIE philosophies?", "options": ["A) Viewing infants as fragile objects that possess zero internal agency.", "B) Restricting sensory exposure to maximize compliance vectors.", "C) Viewing infants as active, competent partners who are fully capable of communicating their needs.", "D) Automating transitions through systemic institutional protocols."], "correct": "C"}, {"id": 27, "type": "MCQ", "question": "In the context of infant-toddler group care, 'scaffolding' during play is executed most effectively when an adult:", "options": ["A) Completes the task for the child to prevent errors or frustration.", "B) Observes carefully and offers subtle structural cues or materials only when the child hits a developmental boundary.", "C) Commands the child to follow a precise step-by-step instructional schematic.", "D) Permanently removes challenging items from the physical space."], "correct": "B"}, {"id": 28, "type": "MCQ", "question": "According to attachment research, a caregiver's 'reflective functioning' refers to their capacity to:", "options": ["A) Understand the underlying mental states, feelings, and intentions behind their own and the infant's behaviors.", "B) Memorize structural milestones found in developmental textbooks.", "C) Maintain an absolute clean physical environment with reflective surfaces.", "D) Standardize behavioral control metrics uniformly."], "correct": "A"}, {"id": 29, "type": "MCQ", "question": "When assessing the quality of responsive interactions in early childhood environments, the 'interactional synchrony' metric evaluates:", "options": ["A) The simultaneous arrival and departure times of children and teachers.", "B) The fluid, mutually adjusted, and harmonious rhythm of conversational exchanges between adult and child.", "C) The matching of mechanical educational materials to age cohorts.", "D) The structural timing of mandatory administration blocks."], "correct": "B"}, {"id": 30, "type": "MCQ", "question": "Within a play-based curriculum framework, what is the core role of documentation (e.g., pedagogical documentation, learning stories)?", "options": ["A) To generate internal competitive rankings across the local student student body.", "B) To verify absolute compliance with non-educational regulatory agencies.", "C) To replace direct observation metrics with automated report sheets.", "D) To render children's thinking, learning processes, and social dynamics visible to support reflective planning."], "correct": "D"}, {"id": 31, "type": "TF", "question": "According to attachment theory, a secure attachment configuration can only be established between an infant and their biological mother.", "options": ["True", "False"], "correct": "False"}, {"id": 32, "type": "TF", "question": "In a play-based curriculum, play is viewed as an ideological vehicle for learning rather than a recreational reward given after academic instruction is completed.", "options": ["True", "False"], "correct": "True"}, {"id": 33, "type": "TF", "question": "Magda Gerber's RIE framework recommends that educators should place infants into physical positions (such as sitting or standing) that they cannot yet achieve independently.", "options": ["True", "False"], "correct": "False"}, {"id": 34, "type": "TF", "question": "Mildred Parten's play research demonstrates that parallel play is an abnormal behavior pattern that indicates social deficits in four-year-old children.", "options": ["True", "False"], "correct": "False"}, {"id": 35, "type": "TF", "question": "The concept of 'serve and return' requires highly complex, expensive technology to build stable neural architectures in an infant's developing brain.", "options": ["True", "False"], "correct": "False"}, {"id": 36, "type": "TF", "question": "Pedagogical documentation should focus exclusively on tracking numerical errors rather than capturing the qualitative nuances of children's thinking processes during exploratory play.", "options": ["True", "False"], "correct": "False"}, {"id": 37, "type": "TF", "question": "Anxious-avoidant attachment configurations often stem from caregiving environments where the primary caregiver consistently rejects or ignores the infant's explicit attachment cues.", "options": ["True", "False"], "correct": "True"}, {"id": 38, "type": "TF", "question": "Dr. Emmi Pikler's motor theory asserts that infants develop exceptional equilibrium and physical safety awareness when left to discover their physical capacities without adult interference.", "options": ["True", "False"], "correct": "True"}, {"id": 39, "type": "TF", "question": "A truly responsive interaction requires an adult to immediately direct and resolve a child's problem rather than providing the child time to experiment.", "options": ["True", "False"], "correct": "False"}, {"id": 40, "type": "TF", "question": "Socio-dramatic play requires advanced cognitive processing because it demands that a child hold multiple mental representations and negotiate abstract rules simultaneously.", "options": ["True", "False"], "correct": "True"}, {"id": 41, "type": "TF", "question": "Primary caregiving assignments are structurally dangerous because they make infants completely unable to function when their assigned educator is temporarily absent.", "options": ["True", "False"], "correct": "False"}, {"id": 42, "type": "TF", "question": "Open-ended materials or 'loose parts' restrict creative exploration because they lack predefined operational guidelines.", "options": ["True", "False"], "correct": "False"}, {"id": 43, "type": "TF", "question": "Edward Tronick's Still Face Experiment demonstrates that infants are deeply sensitive to the emotional expression, availability, and alignment of their social partners.", "options": ["True", "False"], "correct": "True"}, {"id": 44, "type": "TF", "question": "Caregiving routines such as feeding, sleeping transitions, and diapering should be isolated from the formal early childhood curriculum structure.", "options": ["True", "False"], "correct": "False"}, {"id": 45, "type": "TF", "question": "Vygotskian theory posits that high-level pretend play acts as a primary developmental driver because it forces children to detach meanings from physical objects.", "options": ["True", "False"], "correct": "True"}];
+
+        let studentIdentity = "";
+        let academicYear = "";
+        let tabSwitchCounter = 0;
+        let splitScreenDetected = false;
+        let retakeAttemptDetected = false;
+        let activeSession = false;
+
+        // ACCOUNT RECOGNITION AS EDITOR via URL PARAMETER (?role=editor)
+        const urlParams = new URLSearchParams(window.location.search);
+        const isEditorMode = (urlParams.get('role') === 'editor' || urlParams.get('mode') === 'editor');
+
+        if (isEditorMode) {
+            console.log("System Status: Verified Account Editor Context. Disabling security boundaries.");
+            window.addEventListener("DOMContentLoaded", () => {
+                document.getElementById("editor-banner-view").style.display = "block";
+                // Pre-populate fields for effortless editor bypass/testing
+                document.getElementById("student-name").value = "PROFESSOR_EDITOR_PREVIEW";
+                document.getElementById("student-year").value = "BECED 4th Year";
+            });
+        }
+
+        // INITIAL SECURITY RUNTIME EVALUATIONS
+        if (!isEditorMode && localStorage.getItem("beced_midterm_execution_token")) {
+            retakeAttemptDetected = true;
+            enforceImmediateLockdown("RETREAD EXECUTION PREVENTED: You are attempting to initialize a locked or previously evaluated examination session.");
+        }
+
+        // EVALUATE WINDOW PROPORTIONS FOR SPLIT SCREEN DETECTION
+        function runWorkspaceProportionCheck() {
+            if (window.innerWidth < (screen.width * 0.75)) {
+                splitScreenDetected = true;
+                document.getElementById("hud-split").innerText = "Yes";
+                
+                // Block if student, ignore boundary check if Editor account
+                if (activeSession && !isEditorMode) {
+                    enforceImmediateLockdown("SPLIT-SCREEN INTERFACE DISCOVERED: You are running this evaluation in a compressed or split workspace layout. This breaches proctoring rules.");
+                }
+            }
+        }
+
+        // ATTACH REAL-TIME MONITORS
+        window.addEventListener("resize", runWorkspaceProportionCheck);
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden && activeSession) {
+                tabSwitchCounter++;
+                document.getElementById("hud-tab").innerText = tabSwitchCounter;
+                
+                if (!isEditorMode) {
+                    alert("🚨 SYSTEM MONITORING EXCEPTION: Unauthorized focus shift. Your current tab leave tally is " + tabSwitchCounter + ". Further deviation will jeopardize session validation.");
+                }
+            }
+        });
+
+        function enforceImmediateLockdown(reasonText) {
+            document.getElementById("lockdown-rationale").innerText = reasonText;
+            document.getElementById("lockdown-overlay").style.display = "block";
+            
+            if (studentIdentity && !isEditorMode) {
+                executeForcedViolationTransmission();
+            }
+        }
+
+        function initializeExamSession() {
+            studentIdentity = document.getElementById("student-name").value.trim();
+            academicYear = document.getElementById("student-year").value;
+
+            if (!studentIdentity || !academicYear) {
+                alert("CRITICAL ERROR: Valid name and student designation strings are mandatory to authorize execution.");
+                return;
+            }
+
+            runWorkspaceProportionCheck();
+            if (splitScreenDetected && !isEditorMode) {
+                enforceImmediateLockdown("SPLIT-SCREEN INTERFACE DISCOVERED: Adjust browser window configuration to full screen before attempting authentication.");
+                return;
+            }
+
+            document.getElementById("auth-panel").style.display = "none";
+            document.getElementById("quiz-panel").style.display = "block";
+            if (!isEditorMode) {
+                document.getElementById("hud-bar").style.display = "block";
+            }
+            activeSession = true;
+
+            buildPlainQuestionnaire();
+        }
+
+        function buildPlainQuestionnaire() {
+            const mcqContainer = document.getElementById("container-mcq");
+            const tfContainer = document.getElementById("container-tf");
+
+            examPool.forEach((item, index) => {
+                let htmlBlock = `<div class="item-box">
+                    <div class="item-question">Item ${item.id}: ${item.question}</div>`;
+                
+                item.options.forEach(opt => {
+                    htmlBlock += `<label class="option-row">
+                        <input type="radio" name="item_${item.id}" value="${opt.charAt(0)}"> ${opt}
+                    </label>`;
+                });
+                
+                htmlBlock += `</div>`;
+
+                if (item.type === "MCQ") {
+                    mcqContainer.innerHTML += htmlBlock;
+                } else {
+                    tfContainer.innerHTML += htmlBlock;
+                }
+            });
+        }
+
+        function processFinalSubmission() {
+            let finalCalculatedScore = 0;
+            let unattemptedItems = false;
+
+            examPool.forEach(item => {
+                const checkedSelection = document.querySelector(`input[name="item_${item.id}"]:checked`);
+                if (!checkedSelection) {
+                    unattemptedItems = true;
+                } else if (checkedSelection.value === item.correct) {
+                    finalCalculatedScore++;
+                }
+            });
+
+            if (unattemptedItems) {
+                const overrideConfirmation = confirm("WARNING: Unanswered items remain within the questionnaire package. Proceed to lock and transmit anyway?");
+                if (!overrideConfirmation) return;
+            }
+
+            activeSession = false;
+            if (!isEditorMode) {
+                localStorage.setItem("beced_midterm_execution_token", "true");
+            }
+
+            document.getElementById("quiz-panel").style.display = "none";
+            document.getElementById("results-panel").style.display = "block";
+
+            let rawPct = Math.round((finalCalculatedScore / 45) * 100);
+            document.getElementById("score-display").innerText = finalCalculatedScore + " / 45";
+            document.getElementById("percent-display").innerText = rawPct + "%";
+            
+            window.sessionScore = finalCalculatedScore;
+        }
+
+        function executeDataSynchronization() {
+            document.getElementById("sync-button").disabled = true;
+            document.getElementById("sync-status").style.color = "#000000";
+            document.getElementById("sync-status").innerText = "Establishing secure cross-domain ledger pipelines...";
+
+            const packetPayload = {
+                name: studentIdentity,
+                yearLevel: academicYear,
+                score: window.sessionScore,
+                tabSwitches: tabSwitchCounter,
+                splitScreenDetected: splitScreenDetected,
+                retakeAttempted: retakeAttemptDetected
+            };
+
+            if (WEB_APP_URL.includes("YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL")) {
+                setTimeout(() => {
+                    document.getElementById("sync-status").style.color = "#cc3300";
+                    document.getElementById("sync-status").innerText = "⚠️ SIMULATION STATUS MODE ACTIVE. Configure Web App URL to map production traffic.";
+                }, 1200);
+                return;
+            }
+
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(packetPayload)
+            })
+            .then(() => {
+                document.getElementById("sync-status").style.color = "#006600";
+                document.getElementById("sync-status").innerText = "✅ TRANSACTION VERIFIED: Session parameters written to central sheet ledger successfully.";
+            })
+            .catch(err => {
+                document.getElementById("sync-status").style.color = "#cc0000";
+                document.getElementById("sync-status").innerText = "❌ PIPELINE TRANSMISSION FAULT: " + err.toString();
+                document.getElementById("sync-button").disabled = false;
+            });
+        }
+
+        function executeForcedViolationTransmission() {
+            if (WEB_APP_URL.includes("YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL")) return;
+            
+            const panicPayload = {
+                name: studentIdentity,
+                yearLevel: academicYear,
+                score: 0,
+                tabSwitches: tabSwitchCounter,
+                splitScreenDetected: splitScreenDetected,
+                retakeAttempted: retakeAttemptDetected
+            };
+
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(panicPayload)
+            });
+        }
+    </script>
+</body>
+</html>
